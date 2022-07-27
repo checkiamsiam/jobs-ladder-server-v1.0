@@ -10,14 +10,14 @@ async function run() {
   const companyCollection = await mongodb.collection('Companies')
   try {
    
-    userRouter.get('/'  , async (req , res) => {
+    userRouter.get('/' , verifyJWT  , async (req , res) => {
       const query = req.query ;
       const users = await userCollection.find(query) ;
       const result = await users.toArray() ;
       res.send(result)
     })
 
-    userRouter.post('/', async (req, res) => {
+    userRouter.post('/',    async (req, res) => {
       const userData = await req.body;
       const query = { email: userData.email };
       const alreadyUser = await userCollection.findOne(query);
@@ -29,7 +29,7 @@ async function run() {
       res.send({ message: 'User added', accessToken: token })
     })
 
-    userRouter.put('/add-info' , async (req , res) => {
+    userRouter.put('/add-info' , verifyJWT  , async (req , res) => {
       const email = await req?.body?.userEmail
       console.log(req.body);
       const filter =  { email };
