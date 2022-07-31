@@ -29,22 +29,27 @@ async function run() {
       res.send({ message: 'User added', accessToken: token })
     })
 
-    userRouter.put('/add-info' , verifyJWT  , async (req , res) => {
-      const email = await req?.body?.userEmail
-      console.log(req.body);
-      const filter =  { email };
+    userRouter.put("/add-info", verifyJWT , async (req, res) => {
+      const email = await req?.body?.email;
+      const filter = { email };
       const options = { upsert: true };
       const updateDoc = {
         $set: {
-          name : req?.body?.userName , 
-          role: req?.body?.role , 
-          companyName: req?.body?.companyName ,  
+          name: req?.body?.userName,
+          role: req?.body?.role,
+          companyName: req?.body?.companyName,
         },
       };
-      const updateUserInfo = await userCollection.updateOne(filter, updateDoc, options);
-      const insertCompanyName = await companyCollection.insertOne({CompanyName : req?.body?.companyName});
-      res.send({updateUserInfo , insertCompanyName})
-    })
+      const updateUserInfo = await userCollection.updateOne(
+        filter,
+        updateDoc,
+        options
+      );
+      const insertCompanyName = await companyCollection.insertOne({
+        CompanyName: req?.body?.companyName,
+      });
+      res.send({ updateUserInfo, insertCompanyName });
+    });
    
 
   } finally {
