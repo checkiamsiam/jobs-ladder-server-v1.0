@@ -8,12 +8,14 @@ async function run() {
   const userCollection = await mongodb.collection("Users");
   const companyCollection = await mongodb.collection("Companies");
   try {
-    userRouter.get("/", async (req, res) => {
-      const query = req.query;
-      const users = await userCollection.find(query);
-      const result = await users.toArray();
-      res.send(result);
-    });
+   
+    userRouter.get('/' , verifyJWT  , async (req , res) => {
+      const query = req.query ;
+      const users = await userCollection.find(query) ;
+      const result = await users.toArray() ;
+      res.send(result)
+    })
+
 
     userRouter.post("/", async (req, res) => {
       const userData = await req.body;
@@ -27,7 +29,7 @@ async function run() {
       res.send({ message: "User added", accessToken: token });
     });
 
-    userRouter.put("/add-info", async (req, res) => {
+    userRouter.put("/add-info", verifyJWT , async (req, res) => {
       const email = await req?.body?.email;
       const filter = { email };
       const options = { upsert: true };
@@ -48,6 +50,8 @@ async function run() {
       });
       res.send({ updateUserInfo, insertCompanyName });
     });
+   
+
   } finally {
   }
 }
