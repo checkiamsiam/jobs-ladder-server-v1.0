@@ -13,6 +13,7 @@ async function run() {
     const getPosts = await (await jobPostCollection.find(query).toArray()).reverse()
     res.send(getPosts)
   })
+  
   jobPostRouter.post('/' , async (req , res) => {
     const jobData = req.body 
     const postJob = await jobPostCollection.insertOne(jobData)
