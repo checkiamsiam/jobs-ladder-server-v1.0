@@ -35,48 +35,50 @@ async function run() {
       const role = req?.body?.role;
       const filter = { email };
       const options = { upsert: true };
-      const updateDoc = {
+      const existCompany = await companyCollection.findOne({ companySecret });
+
+      const updateHrOrEmployeeData = {
         $set: {
           name,
           role,
           companyName,
+          companySecret,
         },
       };
-      const updateUserInfo = await userCollection.updateOne(
-        filter,
-        updateDoc,
-        options
-      );
-      let insertCompany = {};
-      const existCompany = await companyCollection.findOne({ companySecret });
+
       if (role === "HR") {
         if (existCompany) {
-          insertCompany = {
-            status: "failed",
-            message: "Please try again with another one",
-          };
+          return res.send({ status: "failed", message: "Please try again with another one" });
         } else {
-          insertCompany = await companyCollection.insertOne({
+          const updateHrInfo = await userCollection.updateOne(filter, updateHrOrEmployeeData, options);
+          const addCompany = await companyCollection.insertOne({
             companyName,
             companySecret,
-            employees: [],
+            employee: [],
           });
+          return res.send({ updateHrInfo, addCompany });
+        }
+      } else if (role === "Employee") {
+        if (!existCompany) {
+          return res.send({ status: "failed", message: "company doesn't exist" });
+        } else {
+          const updateEmployeeInfo = await userCollection.updateOne(filter, updateHrOrEmployeeData, options);
+          const addToCompany = await companyCollection.updateOne({ companySecret }, { $push: { employees: { name, email } } }, options);
+          return res.send({ updateEmployeeInfo, addToCompany });
         }
       } else {
-        if (existCompany) {
-          await companyCollection.updateOne(
-            { companySecret },
-            { $push: { employees: { name, email } } },
-            options
-          );
-        } else {
-          insertCompany = {
-            status: "failed",
-            message: "Please try again with another one",
-          };
-        }
+        const updateJobSeeker = await userCollection.updateOne(
+          filter,
+          {
+            $set: {
+              name,
+              role,
+            },
+          },
+          options
+        );
+        return res.send(updateJobSeeker);
       }
-      res.send({ updateUserInfo, insertCompany });
     });
   } finally {
   }
@@ -86,4 +88,3 @@ async function run() {
 run().catch(console.dir);
 
 module.exports = userRouter;
-
