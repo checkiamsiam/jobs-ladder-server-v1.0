@@ -1,44 +1,62 @@
-const express = require('express');
-const { ObjectId } = require('mongodb');
+const express = require("express");
+const { ObjectId } = require("mongodb");
 const jobPostRouter = express.Router();
-const mongodb = require('../../features/mongodb');
-
+const mongodb = require("../../features/mongodb");
 
 async function run() {
-  const jobPostCollection = await mongodb.collection('Job-post')
-  const jobPostResponses = await mongodb.collection('Job-responses')
+  const jobPostCollection = await mongodb.collection("Job-post");
+  const jobPostResponses = await mongodb.collection("Job-responses");
   try {
+    jobPostRouter.get("/count", async (req, res) => {
+      const count = await jobPostCollection.estimatedDocumentCount();
+      res.send({ count });
+    });
 
-    jobPostRouter.get('/', async (req, res) => {
-      const query = req.query
-      const getPosts = await (await jobPostCollection.find(query).toArray()).reverse()
-      res.send(getPosts)
-    })
+    jobPostRouter.get("/", async (req, res) => {
+      const companySecret = await req.query.companySecret;
+      let jobs;
+      if (companySecret) {
+        jobs = await jobPostCollection
+          .find({ companySecret })
+          .sort({ _id: -1 })
+          .toArray();
+      } else {
+        const cursor = await jobPostCollection.find({}).sort({ _id: -1 });
+        const page = await req.query.currentPage;
+        if (page) {
+          jobs = await cursor
+            .skip(page * 10)
+            .limit(10)
+            .toArray();
+        } else {
+          console.log(page);
+          jobs = await cursor.limit(10).toArray();
+        }
+      }
+      res.send(jobs);
+    });
 
-    jobPostRouter.post('/', async (req, res) => {
-      const jobData = req.body
-      const postJob = await jobPostCollection.insertOne(jobData)
-      res.send(postJob)
-    })
+    jobPostRouter.post("/", async (req, res) => {
+      const jobData = req.body;
+      const postJob = await jobPostCollection.insertOne(jobData);
+      res.send(postJob);
+    });
 
-    jobPostRouter.delete('/:id', async (req, res) => {
+    jobPostRouter.delete("/:id", async (req, res) => {
       const id = req.params.id;
-      const query = { _id: ObjectId(id) }
-      const deletePost = await jobPostCollection.deleteOne(query)
-      res.send(deletePost)
+      const query = { _id: ObjectId(id) };
+      const deletePost = await jobPostCollection.deleteOne(query);
+      res.send(deletePost);
+    });
 
-    })
-
-    jobPostRouter.post('/response', async (req, res) => {
+    jobPostRouter.post("/response", async (req, res) => {
       const responseData = req.body;
-      const addResponseData = await jobPostResponses.insertOne(responseData)
-      res.send(addResponseData)
-    })
-
+      const addResponseData = await jobPostResponses.insertOne(responseData);
+      res.send(addResponseData);
+    });
   } finally {
   }
-};
-
+}
 
 // call the async server
 run().catch(console.dir);
