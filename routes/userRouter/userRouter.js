@@ -8,14 +8,12 @@ async function run() {
   const userCollection = await mongodb.collection("Users");
   const companyCollection = await mongodb.collection("Companies");
   try {
-   
-    userRouter.get('/' , verifyJWT  , async (req , res) => {
-      const query = req.query ;
-      const users = await userCollection.find(query) ;
-      const result = await users.toArray() ;
-      res.send(result)
-    })
-
+    userRouter.get("/", verifyJWT, async (req, res) => {
+      const query = req.query;
+      const users = await userCollection.find(query);
+      const result = await users.toArray();
+      res.send(result);
+    });
 
     userRouter.post("/", async (req, res) => {
       const userData = await req.body;
@@ -29,29 +27,59 @@ async function run() {
       res.send({ message: "User added", accessToken: token });
     });
 
-    userRouter.put("/add-info", verifyJWT , async (req, res) => {
+    userRouter.put("/add-info", async (req, res) => {
+      const name = await req?.body?.userName;
       const email = await req?.body?.email;
+      const companyName = req?.body?.companyName;
+      const companySecret = req?.body?.companySecret;
+      const role = req?.body?.role;
       const filter = { email };
       const options = { upsert: true };
-      const updateDoc = {
+      const existCompany = await companyCollection.findOne({ companySecret });
+
+      const updateHrOrEmployeeData = {
         $set: {
-          name: req?.body?.userName,
-          role: req?.body?.role,
-          companyName: req?.body?.companyName,
+          name,
+          role,
+          companyName,
+          companySecret,
         },
       };
-      const updateUserInfo = await userCollection.updateOne(
-        filter,
-        updateDoc,
-        options
-      );
-      const insertCompanyName = await companyCollection.insertOne({
-        CompanyName: req?.body?.companyName,
-      });
-      res.send({ updateUserInfo, insertCompanyName });
-    });
-   
 
+      if (role === "HR") {
+        if (existCompany) {
+          return res.send({ status: "failed", message: "Please try again with another one" });
+        } else {
+          const updateHrInfo = await userCollection.updateOne(filter, updateHrOrEmployeeData, options);
+          const addCompany = await companyCollection.insertOne({
+            companyName,
+            companySecret,
+            employee: [],
+          });
+          return res.send({ updateHrInfo, addCompany });
+        }
+      } else if (role === "Employee") {
+        if (!existCompany) {
+          return res.send({ status: "failed", message: "company doesn't exist" });
+        } else {
+          const updateEmployeeInfo = await userCollection.updateOne(filter, updateHrOrEmployeeData, options);
+          const addToCompany = await companyCollection.updateOne({ companySecret }, { $push: { employee : { name, email } } }, options);
+          return res.send({ updateEmployeeInfo, addToCompany });
+        }
+      } else {
+        const updateJobSeeker = await userCollection.updateOne(
+          filter,
+          {
+            $set: {
+              name,
+              role,
+            },
+          },
+          options
+        );
+        return res.send(updateJobSeeker);
+      }
+    });
   } finally {
   }
 }
