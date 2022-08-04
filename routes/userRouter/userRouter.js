@@ -63,7 +63,7 @@ async function run() {
           return res.send({ status: "failed", message: "company doesn't exist" });
         } else {
           const updateEmployeeInfo = await userCollection.updateOne(filter, updateHrOrEmployeeData, options);
-          const addToCompany = await companyCollection.updateOne({ companySecret }, { $push: { employees: { name, email } } }, options);
+          const addToCompany = await companyCollection.updateOne({ companySecret }, { $push: { employee : { name, email } } }, options);
           return res.send({ updateEmployeeInfo, addToCompany });
         }
       } else {
