@@ -1,3 +1,4 @@
+const { query } = require("express");
 const express = require("express");
 const { ObjectId } = require("mongodb");
 const jobPostRouter = express.Router();
@@ -53,6 +54,18 @@ async function run() {
       const responseData = req.body;
       const addResponseData = await jobPostResponses.insertOne(responseData);
       res.send(addResponseData);
+    });
+
+    // Get Job Title For Individual Company
+    jobPostRouter.get("/job-title", async (req, res) => {
+      const companySecret = { companySecret: req?.query?.companySecret };
+      const projection = { title: 1 };
+      const jobTitle = await jobPostCollection
+        .find(companySecret)
+        .project(projection)
+        .sort({ _id: -1 })
+        .toArray();
+      res.send(jobTitle);
     });
   } finally {
   }
