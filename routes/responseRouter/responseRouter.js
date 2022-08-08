@@ -1,4 +1,5 @@
 const express = require("express");
+const { ObjectId } = require("mongodb");
 const responseRouter = express.Router();
 const mongodb = require("../../features/mongodb");
 
@@ -13,6 +14,14 @@ async function run() {
         .sort({ _id: -1 })
         .toArray();
       res.send(response);
+    });
+
+    // Remove a candidate
+    responseRouter.delete("/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const deleteCandidate = await responseCollection.deleteOne(query);
+      res.send(deleteCandidate);
     });
   } finally {
     // client.close()
