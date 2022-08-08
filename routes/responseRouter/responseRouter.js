@@ -17,9 +17,10 @@ async function run() {
     });
 
     // Remove a candidate
-    responseRouter.delete("/delete-candidate", async (req, res) => {
-      const candidateId = { _id: ObjectId(req?.body?.candidateId) };
-      const deleteCandidate = await responseCollection.deleteOne(candidateId);
+    responseRouter.delete("/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const deleteCandidate = await responseCollection.deleteOne(query);
       res.send(deleteCandidate);
     });
   } finally {
