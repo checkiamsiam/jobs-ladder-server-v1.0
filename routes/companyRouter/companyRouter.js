@@ -1,6 +1,7 @@
 const express = require("express");
 const companyRouter = express.Router();
 const mongodb = require("../../features/mongodb");
+const employeeRouter = require("./employeeRouter/employeeRouter");
 
 async function run() {
   const companyCollection = await mongodb.collection("Companies");
@@ -20,6 +21,7 @@ async function run() {
       const update = await companyCollection.updateOne(filter, data, options);
       res.send(update);
     });
+    companyRouter.use("/", employeeRouter);
   } finally {
   }
 }
