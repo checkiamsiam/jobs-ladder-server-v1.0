@@ -12,7 +12,7 @@ async function run() {
       const details = req.body;
       const addedTask = await taskCollection.insertOne(details);
       const { from, to, taskTitle, taskDetails, companyName } = req?.body;
-
+      console.log(req.body);
       // Send Email with SendInBlue
       const client = Sib.ApiClient.instance;
 
@@ -38,12 +38,12 @@ async function run() {
         subject: `Task: ${taskTitle}`,
         htmlContent: `
         <h2>${taskTitle}</h2> </br>
-        <p style="font-size: 17px">${taskDetails}</p> </br>
-        <button style="border-radius: 6px; background-color: #007FFF; color: white; padding: 8px 17px; border: none; margin-top: 20px">
+        <p style="font-size: 16px; margin-top:20px">${taskDetails}</p> </br>
+        <button style="border-radius: 6px; background-color: #007FFF; color: white; padding: 8px 17px; border: none; margin: 20px 0">
           <a href="https://job-ledder.web.app/" style="color: white; font-size:17px">Visit our Website</a>
         </button>
-        <p style="font-size: 17px; margin-top: 15px">Regards, </p>
-        <p style="font-size: 17px">${companyName}</p>
+        <p style="font-size: 14px; margin: 15px 0 0 0">Regards, </p>
+        <p style="font-size: 14px; margin: 0 0">${companyName}</p>
         `,
       });
       res.send(addedTask);
