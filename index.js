@@ -7,6 +7,7 @@ const userRouter = require("./routes/userRouter/userRouter");
 const jobPostRouter = require("./routes/jobPostRouter/jobPostRouter");
 const companyRouter = require("./routes/companyRouter/companyRouter");
 const responseRouter = require("./routes/responseRouter/responseRouter");
+const taskRouter = require("./routes/taskRouter/taskRouter");
 
 // middle ware
 app.use(express.json());
@@ -17,6 +18,7 @@ app.use("/company", companyRouter);
 app.use("/users", userRouter);
 app.use("/job-post", jobPostRouter);
 app.use("/response", responseRouter);
+app.use("/tasks", taskRouter);
 
 app.get("/", (req, res) => {
   res.send("Welcome to the job's ladder backside");
