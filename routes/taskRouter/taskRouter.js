@@ -2,6 +2,7 @@ const express = require("express");
 const taskRouter = express.Router();
 const mongodb = require("../../features/mongodb");
 const Sib = require("sib-api-v3-sdk");
+const { ObjectId } = require("mongodb");
 require("dotenv").config();
 
 async function run() {
@@ -55,6 +56,26 @@ async function run() {
       const query = { to: email };
       const task = await taskCollection.find(query).sort({ _id: -1 }).toArray();
       res.send(task);
+    });
+
+    // Get a single task details
+    taskRouter.get("/:taskId", async (req, res) => {
+      const taskId = req.params.taskId;
+      const query = { _id: ObjectId(taskId) };
+      const taskDetails = await taskCollection.findOne(query);
+      res.send(taskDetails);
+    });
+
+    // Submit a Task
+    taskRouter.put("/submit", async (req, res) => {
+      const taskId = req.query.id;
+      const query = { _id: ObjectId(taskId) };
+      const options = { upsert: false };
+      const updateInfo = {
+        $set: req.body,
+      };
+      const result = await taskCollection.updateOne(query, updateInfo, options);
+      res.send(result);
     });
   } finally {
   }
