@@ -1,4 +1,4 @@
-const { query } = require("express");
+// const { query } = require("express");
 const express = require("express");
 const { ObjectId } = require("mongodb");
 const jobPostRouter = express.Router();
@@ -14,15 +14,23 @@ async function run() {
     });
 
     jobPostRouter.get("/", async (req, res) => {
+      const searchText = await req.query.searchText;
+      let query = {};
+      if (searchText) {
+        query = { $or: [{ title: { $regex: searchText, $options: "-i" } }] };
+      }
       const companySecret = await req.query.companySecret;
       let jobs;
       if (companySecret) {
-        jobs = await jobPostCollection
-          .find({ companySecret })
-          .sort({ _id: -1 })
-          .toArray();
+        query = {
+          $or: [
+            { title: { $regex: searchText, $options: "-i" } },
+            companySecret,
+          ],
+        };
+        jobs = await jobPostCollection.find(query).sort({ _id: -1 }).toArray();
       } else {
-        const cursor = await jobPostCollection.find({}).sort({ _id: -1 });
+        const cursor = await jobPostCollection.find(query).sort({ _id: -1 });
         const page = await req.query.currentPage;
         if (page) {
           jobs = await cursor
@@ -37,15 +45,15 @@ async function run() {
       res.send(jobs);
     });
 
-    jobPostRouter.get( '/search/:searchKey' , async (req , res) => {
-      const searchText = req.params.searchKey
-      const jobPosts = await jobPostCollection.find({
-        "$or" : [
-          {title : {$regex : searchText , $options : "-i" }}
-        ]
-      }).toArray()
-      res.send(jobPosts)
-    })
+    jobPostRouter.get("/search/:searchKey", async (req, res) => {
+      const searchText = req.params.searchKey;
+      const jobPosts = await jobPostCollection
+        .find({
+          $or: [{ title: { $regex: searchText, $options: "-i" } }],
+        })
+        .toArray();
+      res.send(jobPosts);
+    });
 
     jobPostRouter.post("/", async (req, res) => {
       const jobData = req.body;
