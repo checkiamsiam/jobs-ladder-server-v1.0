@@ -37,6 +37,16 @@ async function run() {
       res.send(jobs);
     });
 
+    jobPostRouter.get( '/search/:searchKey' , async (req , res) => {
+      const searchText = req.params.searchKey
+      const jobPosts = await jobPostCollection.find({
+        "$or" : [
+          {title : {$regex : searchText , $options : "-i" }}
+        ]
+      }).toArray()
+      res.send(jobPosts)
+    })
+
     jobPostRouter.post("/", async (req, res) => {
       const jobData = req.body;
       const postJob = await jobPostCollection.insertOne(jobData);
