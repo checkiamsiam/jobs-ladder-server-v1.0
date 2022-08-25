@@ -41,7 +41,7 @@ async function run() {
       const searchText = req.params.searchKey
       const jobPosts = await jobPostCollection.find({
         "$or" : [
-          {title : {$regex : searchText}}
+          {title : {$regex : searchText , $options : "-i" }}
         ]
       }).toArray()
       res.send(jobPosts)
