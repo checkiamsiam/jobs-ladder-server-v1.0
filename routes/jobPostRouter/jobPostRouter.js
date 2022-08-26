@@ -9,27 +9,41 @@ async function run() {
   const jobPostResponses = await mongodb.collection("Job-responses");
   try {
     jobPostRouter.get("/count", async (req, res) => {
-      const count = await jobPostCollection.estimatedDocumentCount();
+      let query = {};
+      const searchText = await req.query.searchText;
+      if (searchText) {
+        query = {
+          $or: [{ title: { $regex: searchText, $options: "-i" } }],
+        };
+      }
+      const count = await jobPostCollection.countDocuments(query);
       res.send({ count });
     });
 
     jobPostRouter.get("/", async (req, res) => {
+      // Common Variable declare
       const searchText = await req.query.searchText;
       let query = {};
-      if (searchText) {
-        query = { $or: [{ title: { $regex: searchText, $options: "-i" } }] };
-      }
       const companySecret = await req.query.companySecret;
       let jobs;
+
+      // Get Data For HR
       if (companySecret) {
-        query = {
-          $or: [
-            { title: { $regex: searchText, $options: "-i" } },
-            companySecret,
-          ],
-        };
+        if (searchText) {
+          query = {
+            $or: [
+              { title: { $regex: searchText, $options: "-i" }, companySecret },
+            ],
+          };
+        } else {
+          query = { companySecret };
+        }
         jobs = await jobPostCollection.find(query).sort({ _id: -1 }).toArray();
       } else {
+        // Get Data for Job Seeker
+        if (searchText) {
+          query = { $or: [{ title: { $regex: searchText, $options: "-i" } }] };
+        }
         const cursor = await jobPostCollection.find(query).sort({ _id: -1 });
         const page = await req.query.currentPage;
         if (page) {
@@ -43,16 +57,6 @@ async function run() {
         }
       }
       res.send(jobs);
-    });
-
-    jobPostRouter.get("/search/:searchKey", async (req, res) => {
-      const searchText = req.params.searchKey;
-      const jobPosts = await jobPostCollection
-        .find({
-          $or: [{ title: { $regex: searchText, $options: "-i" } }],
-        })
-        .toArray();
-      res.send(jobPosts);
     });
 
     jobPostRouter.post("/", async (req, res) => {
