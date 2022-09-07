@@ -48,9 +48,16 @@ async function run() {
 
       if (role === "HR") {
         if (existCompany) {
-          return res.send({ status: "failed", message: "Please try again with another one" });
+          return res.send({
+            status: "failed",
+            message: "Please try again with another one",
+          });
         } else {
-          const updateHrInfo = await userCollection.updateOne(filter, updateHrOrEmployeeData, options);
+          const updateHrInfo = await userCollection.updateOne(
+            filter,
+            updateHrOrEmployeeData,
+            options
+          );
           const addCompany = await companyCollection.insertOne({
             companyName,
             companySecret,
@@ -60,10 +67,21 @@ async function run() {
         }
       } else if (role === "Employee") {
         if (!existCompany) {
-          return res.send({ status: "failed", message: "company doesn't exist" });
+          return res.send({
+            status: "failed",
+            message: "company doesn't exist",
+          });
         } else {
-          const updateEmployeeInfo = await userCollection.updateOne(filter, updateHrOrEmployeeData, options);
-          const addToCompany = await companyCollection.updateOne({ companySecret }, { $push: { employee : { name, email } } }, options);
+          const updateEmployeeInfo = await userCollection.updateOne(
+            filter,
+            updateHrOrEmployeeData,
+            options
+          );
+          const addToCompany = await companyCollection.updateOne(
+            { companySecret },
+            { $push: { employee: { name, email } } },
+            options
+          );
           return res.send({ updateEmployeeInfo, addToCompany });
         }
       } else {
