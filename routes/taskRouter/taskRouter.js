@@ -13,7 +13,6 @@ async function run() {
       const details = req.body;
       const addedTask = await taskCollection.insertOne(details);
       const { from, to, taskTitle, taskDetails, companyName } = req?.body;
-      console.log(req.body);
       // Send Email with SendInBlue
       const client = Sib.ApiClient.instance;
 
