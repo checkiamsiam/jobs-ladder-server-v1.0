@@ -8,9 +8,9 @@ This is the best platform for making understanding and introductions between job
 
 <br>
 
-### Client Side Code: [https://github.com/itsproali/jobs-ladder-client](https://github.com/itsproali/jobs-ladder-client)
+### Client Side Code: [https://github.com/shakil18046/Job-s-Ladder](https://github.com/shakil18046/Job-s-Ladder)
 
-### Server Side Code: [https://github.com/itsproali/jobs-ladder-server](https://github.com/itsproali/jobs-ladder-server)
+### Server Side Code: [https://github.com/shakil18046/jobs-ladder-server](https://github.com/shakil18046/jobs-ladder-server)
 
 <br>
 

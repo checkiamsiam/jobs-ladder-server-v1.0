@@ -21,6 +21,7 @@ app.use("/job-post", jobPostRouter);
 app.use("/response", responseRouter);
 app.use("/tasks", taskRouter);
 
+// Default Route
 app.get("/", (req, res) => {
   res.send("Welcome to the job's ladder backside");
 });
