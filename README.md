@@ -8,9 +8,7 @@ This is the best platform for making understanding and introductions between job
 
 <br>
 
-### Client Side Code: [https://github.com/shakil18046/Job-s-Ladder](https://github.com/shakil18046/Job-s-Ladder)
-
-### Server Side Code: [https://github.com/shakil18046/jobs-ladder-server](https://github.com/shakil18046/jobs-ladder-server)
+### Client Side Code: [https://github.com/checkiamsiam/jobs-ladder-client](https://github.com/checkiamsiam/jobs-ladder-client)
 
 <br>
 
@@ -59,11 +57,9 @@ This is the best platform for making understanding and introductions between job
 <br>
 
 ### **Contributors :-**
-- [Md Shakil Hossain](https://www.linkedin.com/in/md-shakil-hossain-12b538211)
-- [Mohammad Ali](https://www.linkedin.com/in/itsproali)
 - [Sheikh Shahariar Siam](https://www.linkedin.com/in/checkiamsiam)
-- [Nasiruddin Nahid](https://www.linkedin.com/in/md-nasir-uddin-nahid-061264241)
-- [Imtiaz Samir](https://www.linkedin.com/in/imtiaz-samir-2388bb229)
+- [Mohammad Ali](https://www.linkedin.com/in/itsproali)
+- [Md Shakil Hossain](https://www.linkedin.com/in/md-shakil-hossain-12b538211)
 
 <br>
 
